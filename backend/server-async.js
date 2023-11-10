@@ -1,11 +1,14 @@
 require('module-alias/register');
-const mongoose = require('mongoose');
+// Import the Express.js app
+const app = require('./app');
 // import environmental variables from our variables.env file
 require('dotenv').config({ path: '.env' });
 require('dotenv').config({ path: '.env.local' });
 // Import the 'glob' and 'path' modules
 const glob = require('glob');
 const path = require('path');
+// Import the database connector
+const dbConnect = require('./mongoose.js');
 
 // Make sure we are running node 7.6+
 const [major, minor] = process.versions.node.split('.').map(parseFloat);
@@ -14,16 +17,11 @@ if (major < 14 || (major === 14 && minor <= 0)) {
   process.exit();
 }
 
-// Connect to our Database and handle any bad connections
-mongoose.connect(process.env.DATABASE);
-mongoose.Promise = global.Promise; // Tell Mongoose to use ES6 promises
-mongoose.connection.on('error', (error) => {
-  console.log(
-    `1. 🔥 Common problem that probably caused issue → check your .env file first and add your mongodb url`
-  );
-  console.error({error})
-  // console.error(`🚫 Error → ${error.message}`);
-});
+/**
+ * This code dynamically loads and executes all JavaScript files under the 'models' directory
+ * It's often used in Node.js projects to load modules or code from multiple files at once
+ * This is useful for plugins, extensions, or any situation where you want to organize code in separate files
+ */
 
 // Use 'glob.sync' to find all JavaScript files in the './models' directory and its subdirectories
 // The pattern './models/**/*.js' matches all .js files in the 'models' directory and its subdirectories
@@ -39,13 +37,16 @@ files.forEach(function (file) {
   require(absolutePath);
 });
 
-// This code dynamically loads and executes all JavaScript files under the 'models' directory
-// It's often used in Node.js projects to load modules or code from multiple files at once
-// This is useful for plugins, extensions, or any situation where you want to organize code in separate files
+async function startServer() {
+  await dbConnect();
+  app.set('port', process.env.PORT || 8888);
+  const server = app.listen(app.get(`port`), () => {
+    `🛡️ EXPRESS server listening on port: ${server.address().port} 🛡️`;
+  });
 
-// Start our app!
-const app = require('./app');
-app.set('port', process.env.PORT || 8888);
-const server = app.listen(app.get('port'), () => {
-  console.log(`Express running → On PORT : ${server.address().port}`);
-});
+  // DOWNLOAD AND SAVE GEO CLUSTER DATA OFFLINE
+  await cacheAPIData();
+}
+
+// Start our app/server!
+startServer();
