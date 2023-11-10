@@ -5,35 +5,35 @@ const mongoose = require('mongoose');
 async function DB_CONNECT() {
   try {
     // console.log(chalk.working('Connecting to the remote MongoDB Atlas DB...'));
-    console.log(('Connecting to the remote MongoDB Atlas DB...'));
-    console.log(appConfig.databasePassword);
-    console.log(appConfig.databaseURL);
+    console.log('Connecting to the remote MongoDB Atlas DB...');
+
+    // Surpress `strictQuery` deprecation warning
+    mongoose.set(`strictQuery`, false);
 
     mongoose
       .connect(process.env.DATABASE, {
         // handle mongoDB deprecation warnings
         useNewUrlParser: true,
-        useCreateIndex: true,
-        useFindAndModify: false,
         useUnifiedTopology: true,
       })
       .then((connectionObject) => {
         // console.log((connectionObject))
         // console.log(chalk.connected('YOU CONNECTED TO THE ATLAS DATABASE SUCCESSFULLY '));
-        console.log(('YOU CONNECTED TO THE ATLAS DATABASE SUCCESSFULLY '));
+        console.log('YOU CONNECTED TO THE ATLAS DATABASE SUCCESSFULLY ');
       })
-      .catch((_err) => {
+      .catch((mongooseConnectError) => {
         console.log(
           // chalk.fail(`ERROR CONNECTING TO THE REMOTE DATABASE. CHECK YOUR INTERNET CONNECTION. `)
-          (`ERROR CONNECTING TO THE REMOTE DATABASE. CHECK YOUR INTERNET CONNECTION. `)
+          `ERROR CONNECTING TO THE REMOTE ATLAS DATABASE.`
         );
-        // console.log(chalk.fail(`${_err.message}`));
-        console.log((`${_err.message}`));
+        // console.log(chalk.fail(`${mongooseConnectError.message}`));
+        // console.log(`${mongooseConnectError.message}`);
+        console.log({ mongooseConnectError });
         process.exit();
       });
   } catch (dbConnectErr) {
     // console.log(chalk.fail(`dbConnectErr: ${dbConnectErr.message}`));
-    console.log((`dbConnectErr: ${dbConnectErr.message}`));
+    console.log(`dbConnectErr: ${dbConnectErr.message}`);
     process.exit();
   }
 }

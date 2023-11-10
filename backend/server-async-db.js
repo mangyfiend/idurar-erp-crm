@@ -8,7 +8,7 @@ require('dotenv').config({ path: '.env.local' });
 const glob = require('glob');
 const path = require('path');
 // Import the database connector
-const dbConnect = require('./mongoose.js');
+const dbConnect = require('./db.js');
 
 // Make sure we are running node 7.6+
 const [major, minor] = process.versions.node.split('.').map(parseFloat);
