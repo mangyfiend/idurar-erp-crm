@@ -19,7 +19,7 @@ mongoose.connect(process.env.DATABASE);
 mongoose.Promise = global.Promise; // Tell Mongoose to use ES6 promises
 mongoose.connection.on('error', (error) => {
   console.log(
-    `1. 🔥 Commun Error caused issue → : check your .env file first and add your mongodb url`
+    `1. 🔥 Common problem that caused issue → : check your .env file first and add your mongodb url`
   );
   console.error(`🚫 Error → : ${error.message}`);
 });
